@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <title>Meter Testing Pie Chart</title>
+</head>
+<body>
+    <div id="pie-chart" style="width: 80%; height: 600px; margin: auto;"></div>
+
+    <script>
+        var values = [235, 33, 0.144, 444, 122, 0.2747, 4134, 896, 0.2168, 4829, 1051, 0.2177];
+        var labels = [
+            "Total Invensys Tested", "Total Invensys Failed Testing", "Percentage Failure Invensys", 
+            "Total Rockwell Tested", "Total Rockwell Failed Testing", "Percentage Failure Rockwell", 
+            "Total Sensus Tested", "Total Sensus Failed Testing", "Percentage Failure Sensus", 
+            "Total Meters Tested", "Total Meters Failed Testing", "Percentage Failure Overall"
+        ];
+        
+        var formattedValues = values.map((v, i) => labels[i].includes("Percentage") ? (v * 100).toFixed(2) + "%" : v);
+        
+        var data = [{
+            values: values,
+            labels: labels,
+            type: "pie",
+            hoverinfo: "label+text",
+            text: formattedValues,
+            textinfo: "label+text",
+            textposition: "outside",
+            pull: Array(values.length).fill(0)  // Initially, no slice is enlarged
+        }];
+
+        var layout = {
+            title: "Meter Testing Data",
+            showlegend: true
+        };
+
+        var config = {responsive: true};
+
+        Plotly.newPlot("pie-chart", data, layout, config);
+
+        // Add hover event to enlarge slices
+        document.getElementById("pie-chart").on("plotly_hover", function(data){
+            var newPull = Array(values.length).fill(0);
+            newPull[data.points[0].pointNumber] = 0.2; // Expand hovered slice
+            Plotly.restyle("pie-chart", "pull", [newPull]);
+        });
+
+        document.getElementById("pie-chart").on("plotly_unhover", function(data){
+            Plotly.restyle("pie-chart", "pull", [Array(values.length).fill(0)]); // Reset all slices
+        });
+    </script>
+</body>
+</html>
